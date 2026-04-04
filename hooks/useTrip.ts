@@ -19,18 +19,24 @@ type Trip = {
 }
 
 
-export function useTrip({ refresh }: { refresh: number }) {  // ← idagdag ang param
+export function useTrip({ refresh, page }: { refresh: number, page: number }) {
     const [trips, setTrips] = useState<Trip[]>([]);
+    const [totalCount, setTotalCount] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
-        axios.get("/api/trips")
-            .then(res => setTrips(res.data.data.trips))
+        axios.get(`/api/trips?page=${page}&limit=10`)
+            .then(res => {
+                setTrips(res.data.data.trips)
+                setTotalCount(res.data.data.totalCount)
+                setTotalPages(res.data.data.totalPages)
+            })
             .catch(() => setError("Failed to load trips"))
             .finally(() => setLoading(false));
-    }, [refresh]);
+    }, [refresh, page]); // ← idagdag ang page
 
-    return { trips, loading, error };  // ← idagdag ang return
+    return { trips, totalCount, totalPages, loading, error };
 }

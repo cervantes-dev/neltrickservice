@@ -1,30 +1,49 @@
 "use client"
-import { useTrip } from "@/hooks/useTrip";  // ← import
+import { useState, useEffect } from "react";
+import { useTrip } from "@/hooks/useTrip";
 import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/Table";
 import { ArrowForward, Edit } from "@mui/icons-material";
 import { Menu, MenuTrigger, MenuList, MenuItem } from "@/components/ui/Menu";
 import { EditSquare, Delete, WarningAmber } from "@mui/icons-material";
-import {
-    Modal,
-    ModalTrigger,
-    ModalHeader,
-    ModalOverlay,
-    ModalContent,
-} from "@/components/ui/Modal";
+import { Modal, ModalTrigger, ModalHeader, ModalOverlay, ModalContent } from "@/components/ui/Modal";
 import UpdateStatusForm from "./trip-update-form";
 import TripEdit from "./trip-edit";
 import TripDeleteConfirm from "./trip-delete-confirm";
+import Pagination from "@/components/ui/Pagination"; // ← idagdag
+import TripTableSkeleton from "./table-row-skeleton";
 
 interface TripTableClientProps {
     refresh: number
+    filters: {
+        status: string
+        origin: string
+        destination: string
+        dateFrom: string
+        dateTo: string
+    }
     onSuccess: () => void
 }
 
-export default function TripTableClient({ refresh, onSuccess }: TripTableClientProps) {
-    const { trips, loading, error } = useTrip({ refresh });  // ← gamitin
+export default function TripTableClient({ refresh, filters, onSuccess }: TripTableClientProps) {
+    const [page, setPage] = useState(1) // ← idagdag
 
-    if (loading) return <p className="text-sm text-gray-400 py-4">Loading trips...</p>;
+    // ← i-reset sa page 1 kapag nag-change ang filters
+    useEffect(() => { setPage(1) }, [filters])
+
+    const { trips, totalCount, totalPages, loading, error } = useTrip({ refresh, page }); // ← idagdag page
+
+    // ← palitan ang loading check
+    if (loading) return <TripTableSkeleton />
     if (error) return <p className="text-sm text-red-400 py-4">{error}</p>;
+
+    const filteredTrips = trips.filter(trip => {
+        if (filters.status && trip.status !== filters.status) return false
+        if (filters.origin && !trip.route.origin.toLowerCase().includes(filters.origin.toLowerCase())) return false
+        if (filters.destination && !trip.route.destination.toLowerCase().includes(filters.destination.toLowerCase())) return false
+        if (filters.dateFrom && new Date(trip.schedule.departureDate) < new Date(filters.dateFrom)) return false
+        if (filters.dateTo && new Date(trip.schedule.departureDate) > new Date(filters.dateTo)) return false
+        return true
+    })
 
     return (
         <div className="w-full min-w-0 overflow-x-auto">
@@ -39,7 +58,7 @@ export default function TripTableClient({ refresh, onSuccess }: TripTableClientP
                     <TableHead className="w-10" />
                 </TableHeader>
                 <TableBody>
-                    {trips.map((trip) => (
+                    {filteredTrips.map((trip) => (
                         <TableRow key={trip._id}>
                             <TableCell>{trip.tripId}</TableCell>
                             <TableCell>
@@ -127,6 +146,7 @@ export default function TripTableClient({ refresh, onSuccess }: TripTableClientP
                                                         <UpdateStatusForm
                                                             tripId={trip._id}           // ← ipasa ang trip ID
                                                             currentStatus={trip.status} // ← ipasa ang current status
+                                                            onSuccess={onSuccess}
                                                         />
                                                     </ModalContent>
                                                 </div>
@@ -141,6 +161,7 @@ export default function TripTableClient({ refresh, onSuccess }: TripTableClientP
                                                     icon={<Edit fontSize="small" />}
                                                     variant="default"
                                                     onClick={() => { }}
+                                                    
                                                 />
                                             </ModalTrigger>
 
@@ -159,6 +180,7 @@ export default function TripTableClient({ refresh, onSuccess }: TripTableClientP
                                                                 departureTime: trip.schedule.departureTime,
                                                                 capacityKg: trip.capacityKg,
                                                             }}
+                                                            onSuccess={onSuccess}
                                                         />
                                                     </ModalContent>
 
@@ -200,6 +222,14 @@ export default function TripTableClient({ refresh, onSuccess }: TripTableClientP
                     ))}
                 </TableBody>
             </Table>
+
+            {/* ← idagdag sa baba ng table */}
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                total={totalCount}
+                onPageChange={setPage}
+            />
         </div>
     );
 }

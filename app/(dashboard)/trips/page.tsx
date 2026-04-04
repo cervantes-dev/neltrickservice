@@ -14,26 +14,46 @@ import {
     ModalContent,
 } from "@/components/ui/Modal";
 import TripAddFrom from "@/components/admin/trips/trips-add-form";
+import TripFilter from "@/components/admin/trips/trip-filter";
 
 export default function TripPage() {
     const [refresh, setRefresh] = useState(0);
+    const [addModalOpen, setAddModalOpen] = useState(false)
+
+    // ← ilipat dito galing sa TripTableClient
+    const [filters, setFilters] = useState({
+        status: "",
+        origin: "",
+        destination: "",
+        dateFrom: "",
+        dateTo: "",
+    })
+
+    const hasActiveFilter = Object.values(filters).some(v => v !== "")
+
+    function clearFilters() {
+        setFilters({ status: "", origin: "", destination: "", dateFrom: "", dateTo: "" })
+    }
+
     return (
         <section>
-            <TripStats />
+            <TripStats refresh={refresh} />
             <Card>
                 <CardHeader
                     action={
                         <div className="flex flex-row gap-1">
-                            <Modal>
+                            <Modal isOpen={addModalOpen} onClose={() => setAddModalOpen(false)}>
                                 <ModalTrigger>
-                                    <Button size="xs" icon={<Add sx={{ fontSize: 16 }} />}>
+                                    <Button
+                                        size="xs"
+                                        icon={<Add sx={{ fontSize: 16 }} />}
+                                        onClick={() => setAddModalOpen(true)} // ← buksan
+                                    >
                                         Add Trip
                                     </Button>
                                 </ModalTrigger>
-
                                 <ModalOverlay>
                                     <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-
                                         <ModalHeader>
                                             Add Trip
                                             <br />
@@ -41,40 +61,26 @@ export default function TripPage() {
                                                 Create a new scheduled cargo route
                                             </span>
                                         </ModalHeader>
-
                                         <ModalContent>
-                                            <TripAddFrom />
+                                            <TripAddFrom
+                                                onSuccess={() => {
+                                                    setRefresh(prev => prev + 1)
+                                                    setAddModalOpen(false) // ← isara pagkatapos mag-save
+                                                }}
+                                                onClose={() => setAddModalOpen(false)} // ← isara kapag cancel
+                                            />
                                         </ModalContent>
                                     </div>
                                 </ModalOverlay>
                             </Modal>
-                            <Modal>
-                                <ModalTrigger>
-                                    <Button
-                                        size="xs"
-                                        variant="outline"
-                                        icon={<FilterList sx={{ fontSize: 20 }} />}
-                                    >
-                                        Filter
-                                    </Button>
-                                </ModalTrigger>
-
-                                <ModalOverlay>
-                                    <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-
-                                        <ModalHeader>
-                                            Filter trip record
-                                        </ModalHeader>
-                                        <ModalContent>
-                                            <TripAddFrom />
-                                        </ModalContent>
-                                    </div>
-                                </ModalOverlay>
-                            </Modal>
-
+                            <TripFilter
+                                filters={filters}
+                                onChange={setFilters}
+                                onClear={clearFilters}
+                                hasActive={hasActiveFilter}
+                            />
                         </div>
                     }
-
                 >
                     Trips <br />
                     <span className="text-xs text-gray-400">Manage scheduled cargo routes and capacity</span>
@@ -82,11 +88,11 @@ export default function TripPage() {
                 <CardContent>
                     <TripTableClient
                         refresh={refresh}
+                        filters={filters}  // ← ipasa sa table
                         onSuccess={() => setRefresh(prev => prev + 1)}
                     />
                 </CardContent>
-            </Card >
-
-        </section >
+            </Card>
+        </section>
     )
 }

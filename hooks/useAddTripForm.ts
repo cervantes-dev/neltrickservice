@@ -69,7 +69,7 @@ export function useAddTripForm({ onClose, onSuccess }: AddTripProps) {
             await axios.post("/api/trips", formData);
             sileo.success({
                 title: "Success",
-                position: "top-center",
+                position: "top-right",
                 description: "Trip added successfully",
                 duration: 5000,
                 fill: "black",
