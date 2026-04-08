@@ -57,7 +57,15 @@ export default function BookingRecordClient({ bookings }: Props) {
 
                             {/* Customer + Book date */}
                             <TableCell>
-                                <p className="text-sm">{booking.userId.email}</p>
+                                <p className="text-sm">
+                                    {booking.userId?.email ?? "Walk-in"}
+                                </p>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                    {booking.userId
+                                        ? "Registered"
+                                        : `${booking.senderName} · ${booking.senderContact}`
+                                    }
+                                </p>
                                 <p className="text-xs text-gray-400 mt-0.5">
                                     {new Date(booking.createdAt).toLocaleDateString("en-US", {
                                         month: "short", day: "numeric", year: "numeric"
