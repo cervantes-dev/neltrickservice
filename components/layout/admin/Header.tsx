@@ -13,10 +13,10 @@ interface HeaderProps {
 const pageTitles: Record<string, string> = {
     "/dashboard": "Dashboard",
     "/trips": "Trips",
-    "/shipments": "Shipments",
     "/booking-record": "Booking",
     "/booking-record/create": "Create Booking",
     "/tracking": "Tracking",
+    "/customers": "Customers",
     "/users": "Users",
     "/settings": "Settings",
 };
