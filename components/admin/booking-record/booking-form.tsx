@@ -2,6 +2,9 @@
 import { useState } from "react";
 import Step1Customer from "./steps/step1Customer";
 import Step2Trip from "./steps/step2Trip";
+import Step3Packages from "./steps/step3Packages";
+import Step4Addresses from "./steps/step4Address"
+import Step5Review from "./steps/step5Review";
 import { User } from "@/libs/getUser";
 
 interface SelectedCustomer {
@@ -144,6 +147,31 @@ export default function AdminBookingForm({ user }: AdminBookingFormProps) {
                 />
             )}
 
+            {step === 3 && (
+                <Step3Packages
+                    data={formData}
+                    onNext={(fields) => { updateData(fields); setStep(4) }}
+                    onBack={() => setStep(2)}
+                />
+            )}
+
+
+
+            {step === 4 && (
+                <Step4Addresses
+                    data={formData}
+                    onNext={(fields) => { updateData(fields); setStep(5) }}
+                    onBack={() => setStep(3)}
+                />
+            )}
+
+            {step === 5 && (
+                <Step5Review
+                    data={formData}
+                    user={user}
+                    onBack={() => setStep(4)}
+                />
+            )}
         </div>
     )
 
