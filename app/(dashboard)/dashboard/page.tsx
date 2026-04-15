@@ -1,8 +1,10 @@
+"use client"
+import DashboardStats from "@/components/admin/dashboard/dashboard-stats";
+
 export default function DashboardPage() {
   return (
-   <>
-      <section>stat cards</section>
-      <section>charts</section>
-    </>
+    <section>
+        <DashboardStats />
+    </section>
   )
 }

@@ -4,50 +4,67 @@ import { Trip, Booking } from "@/libs/model/index";
 
 export async function GET(req: Request) {
     try {
-        await connectionToDatabase();
+        await connectionToDatabase()
 
-        const { searchParams } = new URL(req.url);
-        const upcoming = searchParams.get("upcoming");
-        const page = parseInt(searchParams.get("page") ?? "1");
-        const limit = parseInt(searchParams.get("limit") ?? "10");
-        const skip = (page - 1) * limit; // ← page 1 = skip 0, page 2 = skip 10
+        const { searchParams } = new URL(req.url)
+        const page = parseInt(searchParams.get("page") ?? "1")
+        const limit = parseInt(searchParams.get("limit") ?? "10")
+        const skip = (page - 1) * limit
 
-        const filter = upcoming === "true"
-            ? { status: "active", "schedule.departureDate": { $gte: new Date() } }
-            : {};
+        // Move filters to server
+        const status = searchParams.get("status")
+        const origin = searchParams.get("origin")
+        const destination = searchParams.get("destination")
+        const dateFrom = searchParams.get("dateFrom")
+        const dateTo = searchParams.get("dateTo")
+        const upcoming = searchParams.get("upcoming")
+
+        const filter: Record<string, any> = {}
+
+        if (upcoming === "true") {
+            filter.status = "active"
+            filter["schedule.departureDate"] = { $gte: new Date() }
+        } else {
+            if (status) filter.status = status
+            if (origin) filter["route.origin"] = { $regex: origin, $options: "i" }
+            if (destination) filter["route.destination"] = { $regex: destination, $options: "i" }
+            if (dateFrom || dateTo) {
+                filter["schedule.departureDate"] = {}
+                if (dateFrom) filter["schedule.departureDate"].$gte = new Date(dateFrom)
+                if (dateTo) filter["schedule.departureDate"].$lte = new Date(dateTo)
+            }
+        }
 
         const [trips, totalCount] = await Promise.all([
-            Trip.find(filter)
-                .sort({ "schedule.departureDate": 1 })
-                .skip(skip)   // ← idagdag
-                .limit(limit) // ← idagdag
-                .lean(),
-            Trip.countDocuments(filter), // ← filter din, hindi lahat
-        ]);
+            Trip.find(filter).sort({ "schedule.departureDate": 1 }).skip(skip).limit(limit).lean(),
+            Trip.countDocuments(filter),
+        ])
 
-        const totalPages = Math.ceil(totalCount / limit); // ← compute dito
-        const nextTripId = `NLT-TRP-${String(totalCount + 1).padStart(3, "0")}`;
+        const totalPages = Math.ceil(totalCount / limit)
+        const allTripsCount = await Trip.countDocuments()
+        const nextTripId = `NLT-TRP-${String(allTripsCount + 1).padStart(3, "0")}`
 
         const tripsWithUsage = await Promise.all(
             trips.map(async (trip) => {
                 const booked = await Booking.aggregate([
                     { $match: { tripId: trip.tripId } },
                     { $group: { _id: null, total: { $sum: "$totalWeight" } } }
-                ]);
-                return { ...trip, bookedCapacityKg: booked[0]?.total ?? 0 };
+                ])
+                return { ...trip, bookedCapacityKg: booked[0]?.total ?? 0 }
             })
-        );
+        )
 
         return successResponse(
-            { trips: tripsWithUsage, nextTripId, totalCount, totalPages, currentPage: page }, // ← idagdag
+            { trips: tripsWithUsage, nextTripId, totalCount, totalPages, currentPage: page },
             { message: "OK" },
             200
-        );
+        )
     } catch (err) {
-        console.error(err);
-        return errorResponse("Failed to fetch trips", 500);
+        console.error(err)
+        return errorResponse("Failed to fetch trips", 500)
     }
 }
+
 export async function POST(req: Request) {
     try {
         await connectionToDatabase();

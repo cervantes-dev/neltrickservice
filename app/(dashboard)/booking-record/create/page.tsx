@@ -17,8 +17,9 @@ export default function BookingCreatePage() {
                         size="xs"
                         variant="outline"
                         onClick={() => router.back()}
-                    />
-
+                    >
+                        Back
+                    </Button>
                 </CardHeader>
                 <CardContent>
                     <BookingForm />
