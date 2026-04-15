@@ -2,6 +2,7 @@ import {
     FormHTMLAttributes, 
     InputHTMLAttributes, 
     LabelHTMLAttributes, 
+    ReactNode, 
     SelectHTMLAttributes 
 } from "react";
 
@@ -22,6 +23,8 @@ interface FormLabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
 
 interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
+  iconLeft?: ReactNode;
+  iconRight?: ReactNode;
 }
 
 interface FormSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
@@ -68,21 +71,37 @@ export function FormLabel({ children, required, className = "", ...props }: Form
   );
 }
 
-export function FormInput({ error, className = "", ...props }: FormInputProps) {
+export function FormInput({ error, iconLeft, iconRight, className = "", ...props }: FormInputProps) {
   return (
-    <input
-      className={`
-        w-full px-3 py-2 text-sm rounded-md border outline-none
-        placeholder:text-gray-400 text-gray-700
-        transition-all duration-150
-        ${error
-          ? "border-red-400 bg-red-50 focus:ring-2 focus:ring-red-200"
-          : "border-brand-green/30 bg-brand-green/5 focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green/50"
-        }
-        ${className}
-      `}
-      {...props}
-    />
+    <div className="relative w-full flex items-center">
+      {iconLeft && (
+        <span className="absolute left-3 flex items-center pointer-events-none text-gray-400">
+          {iconLeft}
+        </span>
+      )}
+
+      <input
+        className={`
+          w-full px-3 py-2 text-sm rounded-md border outline-none
+          placeholder:text-gray-400 text-gray-700
+          transition-all duration-150
+          ${iconLeft ? "pl-9" : ""}
+          ${iconRight ? "pr-9" : ""}
+          ${error
+            ? "border-red-400 bg-red-50 focus:ring-2 focus:ring-red-200"
+            : "border-brand-green/30 bg-brand-green/5 focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green/50"
+          }
+          ${className}
+        `}
+        {...props}
+      />
+
+      {iconRight && (
+        <span className="absolute right-3 flex items-center pointer-events-none text-gray-400">
+          {iconRight}
+        </span>
+      )}
+    </div>
   );
 }
 

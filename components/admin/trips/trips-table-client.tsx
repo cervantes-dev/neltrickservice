@@ -30,7 +30,7 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
     // ← i-reset sa page 1 kapag nag-change ang filters
     useEffect(() => { setPage(1) }, [filters])
 
-    const { trips, totalCount, totalPages, loading, error } = useTrip({ refresh, page }); // ← idagdag page
+    const { trips, totalCount, totalPages, loading, error } = useTrip({ refresh, page, filters })
 
     // ← palitan ang loading check
     if (loading) return <TripTableSkeleton />
@@ -109,13 +109,15 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                                 ? "bg-gray-300 text-gray-600"
                                                 : trip.status === "cancelled"
                                                     ? "bg-red-100 text-red-600"
-                                                    : trip.status === "completed"
-                                                        ? "bg-blue-100 text-blue-700"
-                                                        : ""
+                                                    : trip.status === "in_transit"
+                                                        ? "bg-amber-100 text-amber-600"
+                                                        : trip.status === "completed"
+                                                            ? "bg-blue-100 text-blue-700"
+                                                            : ""
                                         }
                                     `}
                                 >
-                                    {trip.status}
+                                   {trip.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                                 </span>
                             </TableCell>
                             <TableCell>
@@ -161,7 +163,7 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                                     icon={<Edit fontSize="small" />}
                                                     variant="default"
                                                     onClick={() => { }}
-                                                    
+
                                                 />
                                             </ModalTrigger>
 

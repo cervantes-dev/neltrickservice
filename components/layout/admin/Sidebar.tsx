@@ -6,14 +6,13 @@ import {
   Dashboard,
   DirectionsBoat,
   Mail,
-  LocalShipping,
   ManageAccounts,
   Settings,
-  Inventory2,
   BookOnline,
   BarChart,
   People,
   Receipt,
+  Map,
 } from "@mui/icons-material";
 
 interface SidebarProps {
@@ -24,9 +23,8 @@ interface SidebarProps {
 const navItems = [
   { href: "/dashboard",  icon: <Dashboard      sx={{ fontSize: 18 }} />, label: "Dashboard"  },
   { href: "/trips",         icon: <DirectionsBoat sx={{ fontSize: 18 }} />, label: "Trips"      },
-  { href: "/shipments",  icon: <Inventory2      sx={{ fontSize: 18 }} />, label: "Shipments"  },
   { href: "/booking-record",    icon: <BookOnline      sx={{ fontSize: 18 }} />, label: "Booking"    },
-  { href: "/tracking",   icon: <LocalShipping   sx={{ fontSize: 18 }} />, label: "Tracking"   },
+  { href: "/tracking",   icon: <Map   sx={{ fontSize: 18 }} />, label: "Tracking"   },
   { href: "/customers",  icon: <People          sx={{ fontSize: 18 }} />, label: "Customers"  },
   { href: "/invoices",   icon: <Receipt         sx={{ fontSize: 18 }} />, label: "Invoices"   },
   { href: "/reports",    icon: <BarChart        sx={{ fontSize: 18 }} />, label: "Reports"    },

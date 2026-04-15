@@ -19,9 +19,9 @@ const tripSchema = new Schema(
         capacityKg: { type: Number, required: true, min: 1 },  // e.g. 5000 kg total
         status: {
             type: String,
-            enum: ["draft", "active", "cancelled", "completed"],
+            enum: ["draft", "active", "in_transit", "completed", "cancelled"],
             default: "draft"
-        }
+        },
     },
     { timestamps: true }
 )
