@@ -1,9 +1,10 @@
 import { useState, Children, cloneElement, isValidElement } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
-  children:  React.ReactNode
-  isOpen?:   boolean
-  onClose?:  () => void
+  children: React.ReactNode
+  isOpen?: boolean
+  onClose?: () => void
 }
 
 interface ModalHeaderProps {
@@ -18,7 +19,7 @@ interface ModalContentProps {
 
 interface ModalFooterProps {
   children: React.ReactNode;
-  onClose?: () => void; 
+  onClose?: () => void;
 }
 
 interface ModalTriggerProps {
@@ -30,9 +31,9 @@ interface ModalTriggerProps {
 export function Modal({ children, isOpen: externalOpen, onClose: externalClose }: ModalProps) {
   const [internalOpen, setInternalOpen] = useState(false)
 
-  const isOpen  = externalOpen  !== undefined ? externalOpen  : internalOpen
-  const close   = externalClose !== undefined ? externalClose : () => setInternalOpen(false)
-  const open    = () => setInternalOpen(true)
+  const isOpen = externalOpen !== undefined ? externalOpen : internalOpen
+  const close = externalClose !== undefined ? externalClose : () => setInternalOpen(false)
+  const open = () => setInternalOpen(true)
 
   return (
     <>
@@ -68,7 +69,7 @@ export function ModalOverlay({
 }) {
   if (!isOpen) return null;
 
-  return (
+  const content = (
     <div className="fixed inset-0 z-50 flex items-center justify-center" aria-modal="true">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 w-full max-w-md mx-4">
@@ -79,7 +80,7 @@ export function ModalOverlay({
               if (isValidElement(boxChild) && boxChild.type === ModalHeader) {
                 return cloneElement(boxChild as React.ReactElement<any>, { onClose });
               }
-              if (isValidElement(boxChild) && boxChild.type === ModalContent) { // ← added
+              if (isValidElement(boxChild) && boxChild.type === ModalContent) {
                 return cloneElement(boxChild as React.ReactElement<any>, { onClose });
               }
               if (isValidElement(boxChild) && boxChild.type === ModalFooter) {
@@ -87,7 +88,6 @@ export function ModalOverlay({
               }
               return boxChild;
             });
-
             return cloneElement(child as React.ReactElement<any>, {}, updatedChildren);
           }
           return child;
@@ -95,8 +95,9 @@ export function ModalOverlay({
       </div>
     </div>
   );
-}
 
+  return createPortal(content, document.body); // ← only change here
+}
 export function ModalHeader({ children, onClose }: ModalHeaderProps) {
   return (
     <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">

@@ -7,9 +7,12 @@ import {
     TableRow, TableHead, TableCell
 } from "@/components/ui/Table"
 import { Menu, MenuTrigger, MenuList, MenuItem } from "@/components/ui/Menu"
-import { Visibility, Edit, Delete } from "@mui/icons-material"
+import { Visibility, Edit, Delete, WarningAmber } from "@mui/icons-material"
 import { BookingType, BookingPackageType } from "@/libs/types/booking.type"
 import Pagination from "@/components/ui/Pagination"
+import BookingEditDrawer from "./booking-edit-drawer"
+import { Modal, ModalTrigger, ModalHeader, ModalOverlay, ModalContent } from "@/components/ui/Modal";
+import BookingDeleteConfirm from "./booking-delete-cofirm"
 
 const STATUS_TABS = [
     { label: "All", value: "" },
@@ -24,11 +27,11 @@ export default function BookingRecordClient() {
     const [page, setPage] = useState(1)
     const [refresh, setRefresh] = useState(0)
     const [activeTab, setActiveTab] = useState("")
-
+    const [editingBooking, setEditingBooking] = useState<BookingType | null>(null)
     const { bookings, totalCount, totalPages, loading, error } = useBooking({ refresh, page })
 
     const handleView = (id: string) => router.push(`/booking-record/${id}`)
-    const handleEdit = (id: string) => router.push(`/booking-record/${id}/edit`)
+    const handleEdit = (booking: BookingType) => setEditingBooking(booking)
 
     const handleTabChange = (value: string) => {
         setActiveTab(value)
@@ -189,16 +192,36 @@ export default function BookingRecordClient() {
                                             <MenuItem
                                                 label="Edit"
                                                 icon={<Edit fontSize="small" />}
-                                                onClick={() => handleEdit(booking._id)}
+                                                onClick={() => handleEdit(booking)}
                                             />
                                         )}
                                         {booking.status === "pending" && (
-                                            <MenuItem
-                                                label="Delete"
-                                                icon={<Delete fontSize="small" />}
-                                                variant="danger"
-                                                onClick={() => console.log("delete", booking._id)}
-                                            />
+                                            <Modal>
+                                                <ModalTrigger>
+                                                    <MenuItem
+                                                        label="Delete"
+                                                        icon={<Delete fontSize="small" />}
+                                                        variant="danger"
+                                                        onClick={() => { }}
+                                                    />
+                                                </ModalTrigger>
+
+                                                <ModalOverlay>
+                                                    <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+                                                        <ModalHeader>
+                                                            <WarningAmber className="text-red-500 bg-red-200 p-2 rounded-full" sx={{ fontSize: 40 }} /> Delete Account?
+                                                        </ModalHeader>
+                                                        <ModalContent>
+                                                            <BookingDeleteConfirm
+                                                                bookingId={booking._id}
+                                                                bookingRef={booking.bookingRef}
+                                                                onSuccess={() => setRefresh(r => r + 1)}
+                                                            />
+                                                        </ModalContent>
+
+                                                    </div>
+                                                </ModalOverlay>
+                                            </Modal>
                                         )}
                                     </MenuList>
                                 </Menu>
@@ -224,6 +247,14 @@ export default function BookingRecordClient() {
                 totalPages={totalPages}
                 total={totalCount}
                 onPageChange={setPage}
+            />
+            <BookingEditDrawer
+                booking={editingBooking}
+                onClose={() => setEditingBooking(null)}
+                onSaved={() => {
+                    setEditingBooking(null)
+                    setRefresh(r => r + 1)
+                }}
             />
         </div>
     )
