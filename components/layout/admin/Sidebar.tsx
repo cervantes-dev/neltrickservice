@@ -24,7 +24,6 @@ const navItems = [
   { href: "/dashboard",  icon: <Dashboard      sx={{ fontSize: 18 }} />, label: "Dashboard"  },
   { href: "/trips",         icon: <DirectionsBoat sx={{ fontSize: 18 }} />, label: "Trips"      },
   { href: "/booking-record",    icon: <BookOnline      sx={{ fontSize: 18 }} />, label: "Booking"    },
-  { href: "/tracking",   icon: <Map   sx={{ fontSize: 18 }} />, label: "Tracking"   },
   { href: "/customers",  icon: <People          sx={{ fontSize: 18 }} />, label: "Customers"  },
   { href: "/inbox",      icon: <Mail            sx={{ fontSize: 18 }} />, label: "Messages"   },
   { href: "/users",      icon: <ManageAccounts  sx={{ fontSize: 18 }} />, label: "Users"      },
