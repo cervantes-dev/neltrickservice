@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"
 import { useTrip } from "@/hooks/useTrip";
 import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/Table";
 import { ArrowForward, Edit } from "@mui/icons-material";
@@ -25,6 +26,7 @@ interface TripTableClientProps {
 }
 
 export default function TripTableClient({ refresh, filters, onSuccess }: TripTableClientProps) {
+    const router = useRouter()
     const [page, setPage] = useState(1) // ← idagdag
 
     // ← i-reset sa page 1 kapag nag-change ang filters
@@ -59,7 +61,11 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                 </TableHeader>
                 <TableBody>
                     {filteredTrips.map((trip) => (
-                        <TableRow key={trip._id}>
+                        <TableRow
+                            key={trip._id}
+                            onClick={() => router.push(`/trips/${trip._id}`)}
+                            className="cursor-pointer"
+                        >
                             <TableCell>{trip.tripId}</TableCell>
                             <TableCell>
                                 {trip.route.origin}
@@ -117,10 +123,10 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                         }
                                     `}
                                 >
-                                   {trip.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                                    {trip.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
                                 </span>
                             </TableCell>
-                            <TableCell>
+                           <TableCell onClick={e => e.stopPropagation()}>
                                 <Menu>
                                     <MenuTrigger />
                                     <MenuList>
