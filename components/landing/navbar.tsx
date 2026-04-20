@@ -21,10 +21,10 @@ export default function Navbar() {
 
                 {/* Desktop links */}
                 <div className="hidden md:flex items-center gap-8">
-                    <Link href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Services</Link>
-                    <Link href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Pricing</Link>
-                    <Link href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">About</Link>
-                    <Link href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Contact</Link>
+                    <Link href="#tracking" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Tracking</Link>
+                    <Link href="#services" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Services</Link>
+                    <Link href="#about" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">About</Link>
+                    <Link href="#contact" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Contact</Link>
                 </div>
 
                 {/* Desktop CTA */}
@@ -45,7 +45,7 @@ export default function Navbar() {
                                     Login
                                 </ModalHeader>
                                 <ModalContent>
-                                  <LoginForm />
+                                    <LoginForm />
                                 </ModalContent>
                             </div>
                         </ModalOverlay>
