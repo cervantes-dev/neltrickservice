@@ -5,13 +5,13 @@ import { useTrip } from "@/hooks/useTrip";
 import { Table, TableHeader, TableHead, TableBody, TableCell, TableRow } from "@/components/ui/Table";
 import { ArrowForward, Edit } from "@mui/icons-material";
 import { Menu, MenuTrigger, MenuList, MenuItem } from "@/components/ui/Menu";
-import { EditSquare, Delete, WarningAmber } from "@mui/icons-material";
+import { Delete, WarningAmber } from "@mui/icons-material";
 import { Modal, ModalTrigger, ModalHeader, ModalOverlay, ModalContent } from "@/components/ui/Modal";
-import UpdateStatusForm from "./trip-update-form";
 import TripEdit from "./trip-edit";
 import TripDeleteConfirm from "./trip-delete-confirm";
-import Pagination from "@/components/ui/Pagination"; // ← idagdag
+import Pagination from "@/components/ui/Pagination";
 import TripTableSkeleton from "./table-row-skeleton";
+import axios from "axios";
 
 interface TripTableClientProps {
     refresh: number
@@ -25,16 +25,68 @@ interface TripTableClientProps {
     onSuccess: () => void
 }
 
+const TRIP_STATUS_OPTIONS = [
+    { value: "draft", label: "Draft" },
+    { value: "active", label: "Active" },
+    { value: "in_transit", label: "In Transit" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" },
+]
+
+const STATUS_COLOR: Record<string, string> = {
+    active: "text-green-700 border-green-300 bg-green-50",
+    draft: "text-gray-600 border-gray-200 bg-gray-100",
+    cancelled: "text-red-600 border-red-200 bg-red-50",
+    in_transit: "text-amber-600 border-amber-200 bg-amber-50",
+    completed: "text-blue-700 border-blue-200 bg-blue-50",
+}
+
+function UpdateTripStatusSelect({
+    tripId,
+    currentStatus,
+    onSuccess,
+}: {
+    tripId: string
+    currentStatus: string
+    onSuccess: () => void
+}) {
+    const [status, setStatus] = useState(currentStatus)
+    const [loading, setLoading] = useState(false)
+
+    async function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        const newStatus = e.target.value
+        setStatus(newStatus)
+        setLoading(true)
+        await axios.patch(`/api/trips/${tripId}/status`, { status: newStatus })
+        setLoading(false)
+        onSuccess()
+    }
+
+    return (
+        <select
+            value={status}
+            onChange={handleChange}
+            disabled={loading}
+            onClick={e => e.stopPropagation()}
+            className={`text-[11px] border rounded-full px-2 py-0.5 font-medium capitalize cursor-pointer outline-none hover:opacity-80 transition-all disabled:opacity-50 ${STATUS_COLOR[status] ?? "text-gray-600 border-gray-200 bg-white"}`}
+        >
+            {TRIP_STATUS_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                </option>
+            ))}
+        </select>
+    )
+}
+
 export default function TripTableClient({ refresh, filters, onSuccess }: TripTableClientProps) {
     const router = useRouter()
-    const [page, setPage] = useState(1) // ← idagdag
+    const [page, setPage] = useState(1)
 
-    // ← i-reset sa page 1 kapag nag-change ang filters
     useEffect(() => { setPage(1) }, [filters])
 
     const { trips, totalCount, totalPages, loading, error } = useTrip({ refresh, page, filters })
 
-    // ← palitan ang loading check
     if (loading) return <TripTableSkeleton />
     if (error) return <p className="text-sm text-red-400 py-4">{error}</p>;
 
@@ -106,60 +158,21 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                     </div>
                                 </div>
                             </TableCell>
-                            <TableCell>
-                                <span
-                                    className={`inline-flex items-center text-center rounded-full px-2 py-0.5 text-xs capitalize font-medium
-                                    ${trip.status === "active"
-                                            ? "bg-green-100 text-green-700"
-                                            : trip.status === "draft"
-                                                ? "bg-gray-300 text-gray-600"
-                                                : trip.status === "cancelled"
-                                                    ? "bg-red-100 text-red-600"
-                                                    : trip.status === "in_transit"
-                                                        ? "bg-amber-100 text-amber-600"
-                                                        : trip.status === "completed"
-                                                            ? "bg-blue-100 text-blue-700"
-                                                            : ""
-                                        }
-                                    `}
-                                >
-                                    {trip.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
-                                </span>
+
+                            {/* Status dropdown */}
+                            <TableCell onClick={e => e.stopPropagation()}>
+                                <UpdateTripStatusSelect
+                                    tripId={trip._id}
+                                    currentStatus={trip.status}
+                                    onSuccess={onSuccess}
+                                />
                             </TableCell>
-                           <TableCell onClick={e => e.stopPropagation()}>
+
+                            {/* Actions: Edit + Delete only */}
+                            <TableCell onClick={e => e.stopPropagation()}>
                                 <Menu>
                                     <MenuTrigger />
                                     <MenuList>
-
-                                        {/* Update Status */}
-                                        <Modal>
-                                            <ModalTrigger>
-                                                <MenuItem
-                                                    label="Update Status"
-                                                    icon={<EditSquare fontSize="small" />}
-                                                    variant="default"
-                                                    onClick={() => { }}
-                                                />
-                                            </ModalTrigger>
-                                            <ModalOverlay>
-                                                <div className="bg-white rounded-xl shadow-xl overflow-hidden">
-                                                    <ModalHeader>
-                                                        Update Trip Status
-                                                        <br />
-                                                        <span className="text-xs text-gray-400">
-                                                            Note: By setting status to active it let the client to book
-                                                        </span>
-                                                    </ModalHeader>
-                                                    <ModalContent>
-                                                        <UpdateStatusForm
-                                                            tripId={trip._id}           // ← ipasa ang trip ID
-                                                            currentStatus={trip.status} // ← ipasa ang current status
-                                                            onSuccess={onSuccess}
-                                                        />
-                                                    </ModalContent>
-                                                </div>
-                                            </ModalOverlay>
-                                        </Modal>
 
                                         {/* Edit Trip */}
                                         <Modal>
@@ -169,10 +182,8 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                                     icon={<Edit fontSize="small" />}
                                                     variant="default"
                                                     onClick={() => { }}
-
                                                 />
                                             </ModalTrigger>
-
                                             <ModalOverlay>
                                                 <div className="bg-white rounded-xl shadow-xl overflow-hidden">
                                                     <ModalHeader>
@@ -191,7 +202,6 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                                             onSuccess={onSuccess}
                                                         />
                                                     </ModalContent>
-
                                                 </div>
                                             </ModalOverlay>
                                         </Modal>
@@ -206,11 +216,10 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                                     onClick={() => { }}
                                                 />
                                             </ModalTrigger>
-
                                             <ModalOverlay>
                                                 <div className="bg-white rounded-xl shadow-xl overflow-hidden">
                                                     <ModalHeader>
-                                                        <WarningAmber className="text-red-500 bg-red-200 p-2 rounded-full" sx={{ fontSize: 40 }} /> Delete Account?
+                                                        <WarningAmber className="text-red-500 bg-red-200 p-2 rounded-full" sx={{ fontSize: 40 }} /> Delete Trip?
                                                     </ModalHeader>
                                                     <ModalContent>
                                                         <TripDeleteConfirm
@@ -219,10 +228,10 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                                                             onSuccess={onSuccess}
                                                         />
                                                     </ModalContent>
-
                                                 </div>
                                             </ModalOverlay>
                                         </Modal>
+
                                     </MenuList>
                                 </Menu>
                             </TableCell>
@@ -231,7 +240,6 @@ export default function TripTableClient({ refresh, filters, onSuccess }: TripTab
                 </TableBody>
             </Table>
 
-            {/* ← idagdag sa baba ng table */}
             <Pagination
                 currentPage={page}
                 totalPages={totalPages}
