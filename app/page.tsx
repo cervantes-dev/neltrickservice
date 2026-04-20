@@ -1,3 +1,5 @@
+import About from "@/components/landing/About"
+import Contact from "@/components/landing/Contact"
 import Hero from "@/components/landing/Hero"
 import Navbar from "@/components/landing/navbar"
 import Services from "@/components/landing/Services"
@@ -10,9 +12,8 @@ export default function LandingPage() {
       <Hero />
       <Tracking />
       <Services />
-      {/* <Pricing /> */}
-      {/* <About /> */}
-      {/* <Contact /> */}
+      <About />
+      <Contact />
     </div>
   )
 }
