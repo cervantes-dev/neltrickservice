@@ -77,19 +77,6 @@ export function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
                     );
                 })}
             </nav>
-
-            {sidebarOpen && (
-                <div className="p-4 border-t border-sidebar-border flex items-center gap-3 font-body">
-                    {/* User Avatar */}
-                    <div className="w-8 h-8 rounded-full bg-brand-green flex items-center justify-center text-white font-medium text-sm">
-                        J
-                    </div>
-
-                    {/* User Name */}
-                    <p className="text-sm text-navy font-medium leading-5">John Doe</p>
-                </div>
-            )}
-
         </aside>
     )
 }
