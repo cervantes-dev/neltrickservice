@@ -56,7 +56,7 @@ export async function validateLogin(initialState: LoginState, formData: FormData
         }
 
         // Generate JWT
-        const token = await new SignJWT({ sub: user._id.toString(), email: user.email })
+        const token = await new SignJWT({ sub: user._id.toString(), email: user.email, tokenVersion: user.tokenVersion, })
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
             .setExpirationTime('7d')
