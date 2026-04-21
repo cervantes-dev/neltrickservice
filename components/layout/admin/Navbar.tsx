@@ -10,25 +10,25 @@ interface HeaderProps {
 }
 
 const pageTitles: Record<string, string> = {
-    "/dashboard": "Dashboard",
-    "/trips": "Trips",
-    "/booking-record": "Booking",
-    "/booking-record/create": "Create Booking",
-    "/tracking": "Tracking",
-    "/customers": "Customers",
-    "/users": "Users",
-    "/settings": "Settings",
+  "/dashboard": "Dashboard",
+  "/trips": "Trips",
+  "/booking-record": "Booking",
+  "/booking-record/create": "Create Booking",
+  "/tracking": "Tracking",
+  "/customers": "Customers",
+  "/users": "Users",
+  "/settings": "Settings",
 };
 
 function getPageTitle(pathname: string): string {
-    if (pageTitles[pathname]) return pageTitles[pathname];
-    if (pathname.startsWith("/booking-record/")) return "Booking Details";
-    if (pathname.startsWith("/shipments/")) return "Shipment Details";
-    if (pathname.startsWith("/customers/")) return "Customer Details";
-    return "Dashboard";
+  if (pageTitles[pathname]) return pageTitles[pathname];
+  if (pathname.startsWith("/booking-record/")) return "Booking Details";
+  if (pathname.startsWith("/shipments/")) return "Shipment Details";
+  if (pathname.startsWith("/customers/")) return "Customer Details";
+  return "Dashboard";
 }
 
-export function Header({ sidebarOpen, setSidebarOpen }: HeaderProps) {
+export function Navbar({ sidebarOpen, setSidebarOpen }: HeaderProps) {
   const pathname = usePathname();
   const title = getPageTitle(pathname);
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -84,14 +84,17 @@ export function Header({ sidebarOpen, setSidebarOpen }: HeaderProps) {
           {/* Dropdown */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border border-border z-50">
-              
+
               {/* User info */}
               <div className="px-4 py-2 border-b border-border">
                 <p className="text-sm font-semibold text-navy truncate">{userName}</p>
               </div>
 
               {/* Logout */}
-              <LogoutButton />
+              {/* Logout */}
+              <div className="px-2 py-1">
+                <LogoutButton />
+              </div>
             </div>
           )}
         </div>

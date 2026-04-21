@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import {Toaster} from "sileo";
-import { Header } from "@/components/layout/admin/Header"
+import { Navbar } from "@/components/layout/admin/Navbar"
 import { Sidebar } from "@/components/layout/admin/Sidebar"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             )}
 
             <div className="flex flex-col flex-1 min-w-0 lg:ml-0">
-                <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+                <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
                 <Toaster  />
                 <main className="overflow-y-auto flex-1 bg-bg-primary p-4 md:p-6">
                     <div className="max-w-6xl mx-auto space-y-4 md:space-y-6 w-full">
