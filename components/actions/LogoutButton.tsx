@@ -16,12 +16,13 @@ export function LogoutButton() {
     const [open, setOpen] = useState(false)
 
     return (
-        <Modal isOpen={open} onClose={() => setOpen(false)}>  
+        <Modal isOpen={open} onClose={() => setOpen(false)}>
             <ModalTrigger>
                 <Button
+                    className="w-full"
                     size="sm"
                     variant="danger"
-                    onClick={() => setOpen(true)} 
+                    onClick={() => setOpen(true)}
                 >
                     Logout
                 </Button>
@@ -38,7 +39,7 @@ export function LogoutButton() {
                                 size="sm"
                                 variant="ghost"
                                 type="button"
-                                onClick={() => setOpen(false)} 
+                                onClick={() => setOpen(false)}
                             >
                                 Cancel
                             </Button>
