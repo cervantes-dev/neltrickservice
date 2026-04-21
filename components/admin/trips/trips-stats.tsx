@@ -1,10 +1,10 @@
 import { StatsCard } from "@/components/shared/stats-card";
 import { DirectionsBoat, DirectionsBus, Inventory2, BarChart } from "@mui/icons-material";
-import { useStats } from "@/hooks/useStats";
+import { useTripStats } from "@/hooks/useStats";
 import TripStatsSkeleton from "./trip-stats-skeleton";
 
 export default function TripStats({ refresh }: { refresh: number }) {
-    const { stats, loading } = useStats({ refresh })
+    const { stats, loading } = useTripStats({ refresh })
  if (loading) return <TripStatsSkeleton />
 
     return (
