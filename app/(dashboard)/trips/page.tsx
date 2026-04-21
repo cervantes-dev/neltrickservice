@@ -5,7 +5,7 @@ import TripStats from "@/components/admin/trips/trips-stats";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/Card";
 import TripTableClient from "@/components/admin/trips/trips-table-client";
 import Button from "@/components/ui/Button";
-import { Add, FilterList } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import {
     Modal,
     ModalTrigger,
